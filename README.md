@@ -98,5 +98,82 @@ def get_data():
 
 ```
 
+## Model
+
+### Approach: Transfer Learning
+
+--> Pre-trained Model: A pre-trained model is a neural network that has been trained on a large dataset, usually for a generic task like image classification, object detection, or natural language understanding. These models have learned to extract useful features from data.
+
+--> Fine-Tuning: Instead of training a neural network from scratch, you take a pre-trained model and modify it by adding or changing the final layers, which are specific to the new task you want to solve. This process is called fine-tuning.
+
+--> Training: The modified model is then trained on a smaller dataset for the specific task you're interested in. Since the model has already learned useful features from the large dataset it was initially trained on, it can converge more quickly and effectively on the new task.
+
+--> We are training our model on EfficientNet_B0 (smaller model for faster computation and accuracy)
+
+--> Let's base the model on EfficientNetB0. We'll include the option to swap out average pooling for max pooling and another option to freeze the backbone. As a default we'll assume we want to use average pooling and finetune the backbone feature layers.
+
+```python
+
+# model = Net()
+freeze_backbone = False
+use_max_pooling = False
+
+model = models.efficientnet_b0(pretrained=True)
+
+if use_max_pooling:
+    maxpools = [k.split('.') for k, m in model.named_modules() if type(m).__name__ == 'AdaptiveAvgPool2d']
+    for *parent, k in maxpools:
+        setattr(model.get_submodule('.'.join(parent)),'avgpool',nn.AdaptiveMaxPool2d(output_size=1))
+
+if freeze_backbone:
+    for params in model.parameters():
+        params.requires_grad = False
+
+model.classifier = nn.Sequential(
+    # nn.BatchNorm1d(num_features=1536,momentum=0.95),
+    nn.Linear(in_features=1280, out_features=512),
+    nn.ReLU(),
+    # nn.Dropout(0.3),
+    # nn.BatchNorm1d(num_features=512,momentum=0.95),
+    #nn.Linear(in_features=512, out_features=512),
+    #nn.ReLU(),
+    # nn.Dropout(0.3),
+    nn.Linear(in_features=512,out_features=3),
+    nn.Softmax()
+)
+
+print(model)
+
+summary(model.cuda(),(3, 160, 160))
+
+```
+
+## Training
+
+--> Now we can train the network -- we'll use the Adam optimizer. Note we'll compute the accuracy based on the maximum output value, and track both accuracy and loss over each epoch. We'll also schedule learning rate decay.
+
+```python
+lr = 0.0005
+lr_ratio = 0.5
+patience = 3
+
+criterion = nn.CrossEntropyLoss()
+optimizer = optim.Adam(model.parameters(), lr=lr)
+# optimizer = optim.SGD(model.parameters(), lr=lr, momentum=0.9)
+
+scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'max',patience=patience,factor=lr_ratio)
+
+if torch.cuda.is_available(): # Checking if we can use GPU
+    print("USING GPU")
+    model = model.cuda()
+    criterion = criterion.cuda()
+```
+
+#### We have trained the model on total of 50 epochs, its starts overfitting after 80 percent testing accuracy so training more epochs on the same parameters will give the same result
+
+---> For complete training code check: 
 
 
+## Evaluation
+
+![Alt text](https://github.com/pchaudhary12/facial-recognition-image-classification/blob/main/images/image.png)
