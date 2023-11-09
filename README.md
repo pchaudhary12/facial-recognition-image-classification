@@ -26,7 +26,7 @@
 
 --> The following class is a customized torch dataset class that allows us to specify the transform process (so we can have one transform for training and another for testing).
 
-```
+```python
 class MyLazyDataset(torch.utils.data.Dataset):
     def __init__(self, dataset, transform=None):
         self.dataset = dataset
@@ -44,7 +44,7 @@ class MyLazyDataset(torch.utils.data.Dataset):
         return len(self.dataset)
 ```
 
-```
+```python
 batch_size = 32
 
 xmin_list = [0.2, 0.05, 0.2]
@@ -95,6 +95,8 @@ def get_data():
  
     
     return train, test
-    
+
 ```
+
+
 
