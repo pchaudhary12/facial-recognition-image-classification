@@ -171,9 +171,34 @@ if torch.cuda.is_available(): # Checking if we can use GPU
 
 #### We have trained the model on total of 50 epochs, its starts overfitting after 80 percent testing accuracy so training more epochs on the same parameters will give the same result
 
----> For complete training code check: 
+---> For complete training code check: https://github.com/pchaudhary12/facial-recognition-image-classification/tree/main/project_code
 
 
 ## Evaluation
 
 ![Alt text](https://github.com/pchaudhary12/facial-recognition-image-classification/blob/main/images/image.png)
+
+--> As seen the model testing accuracy is not going over 80 percent where the training accuracy is going over 90, this is sign of overfitting as testing accuracy is stuck at 80 percent, however it is still considerable testing accuracy.
+
+## Running Prediction after creating the model
+
+--> We are now doing prediction on the unintroducted test image samples after saving the model, to see if the prediction is consistant.
+
+![Alt text](https://github.com/pchaudhary12/facial-recognition-image-classification/blob/main/images/image1.png)
+
+--> We are getting 80.7 Accuracy with this prediction.
+
+--> As seen from the precision and confusion matrix, the model is performing very well with class: Happy, and have 70 percent precision with both Neutral and Sad, as it is understandable that the facial features are similar with both the expression
+
+## Room for Improvement
+
+--> Model accuracy can be improved with more time
+
+--> Try training model with different parameters for efficiency.
+
+--> Preprocessing the image data in way that it  only takes facial Landmarks that explains the expression on the face to imrpove the model.
+
+--> Can try larger pre-trained model if have more computation power.
+
+
+
